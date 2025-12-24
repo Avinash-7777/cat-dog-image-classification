@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cat vs Dog Classifier</title>
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+
+  <style>
+    :root {
+      --bg: #050816;
+      --card-bg: rgba(15, 23, 42, 0.92);
+      --accent: #6366f1;
+      --accent-2: #ec4899;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #1e293b, #020617 50%, #000 100%);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #e5e7eb;
+    }
+
+    .shell {
+      position: relative;
+      width: min(1100px, 100%);
+      padding: 32px;
+    }
+
+    .shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 32px;
+      background: conic-gradient(from 160deg, #6366f1, #ec4899, #22c55e, #6366f1);
+      opacity: 0.25;
+      filter: blur(42px);
+      z-index: -2;
+    }
+
+    .glass {
+      backdrop-filter: blur(26px);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.88));
+      border-radius: 26px;
+      border: 1px solid rgba(148, 163, 184, 0.23);
+      box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.8),
+        0 0 0 1px rgba(15, 23, 42, 0.4);
+      padding: 32px 28px;
+    }
+
+    .title {
+      font-weight: 700;
+      font-size: 2.1rem;
+      letter-spacing: 0.03em;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #9ca3af;
+      font-size: 0.96rem;
+      margin-bottom: 32px;
+    }
+
+    .tag-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      background: rgba(79, 70, 229, 0.08);
+      border: 1px solid rgba(129, 140, 248, 0.35);
+      color: #a5b4fc;
+    }
+
+    .upload-zone {
+      border-radius: 20px;
+      border: 1px dashed rgba(148, 163, 184, 0.7);
+      padding: 34px 28px;
+      background: radial-gradient(circle at top left, rgba(79, 70, 229, 0.16), transparent 55%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-align: center;
+      transition: all 0.22s ease-out;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .upload-zone:hover {
+      border-color: rgba(129, 140, 248, 0.95);
+      box-shadow: 0 18px 45px rgba(79, 70, 229, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .upload-icon-wrap {
+      height: 64px;
+      width: 64px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 0%, #4f46e5, #0f172a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow:
+        0 0 0 1px rgba(129, 140, 248, 0.6),
+        0 16px 30px rgba(79, 70, 229, 0.7);
+      margin-bottom: 4px;
+    }
+
+    .upload-title {
+      font-size: 1.02rem;
+      font-weight: 600;
+    }
+
+    .upload-hint {
+      font-size: 0.85rem;
+      color: #9ca3af;
+    }
+
+    .file-name {
+      font-size: 0.86rem;
+      color: #a5b4fc;
+      margin-top: 6px;
+    }
+
+    .btn-gradient {
+      width: 100%;
+      border-radius: 999px;
+      border: none;
+      padding: 10px 20px;
+      margin-top: 20px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      background: linear-gradient(120deg, var(--accent), var(--accent-2));
+      color: #f9fafb;
+      box-shadow:
+        0 14px 40px rgba(99, 102, 241, 0.7),
+        0 0 0 1px rgba(168, 85, 247, 0.35);
+      transition: all 0.18s ease-out;
+    }
+
+    .btn-gradient:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.07);
+    }
+
+    .result-card {
+      margin-top: 24px;
+      padding: 18px 18px 16px;
+      border-radius: 18px;
+      background: radial-gradient(circle at top, rgba(34, 197, 94, 0.18), rgba(15, 23, 42, 0.98));
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      box-shadow: 0 16px 40px rgba(22, 163, 74, 0.45);
+    }
+
+    .result-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #bbf7d0;
+      margin-bottom: 2px;
+    }
+
+    .result-value {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #ecfdf5;
+    }
+
+    .preview-wrapper {
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    .preview-img {
+      max-height: 260px;
+      border-radius: 16px;
+      object-fit: cover;
+      box-shadow:
+        0 22px 60px rgba(15, 23, 42, 0.95),
+        0 0 0 1px rgba(30, 64, 175, 0.5);
+    }
+
+    .preview-caption {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 768px) {
+      .glass {
+        padding: 22px 18px;
+      }
+      .title {
+        font-size: 1.6rem;
+      }
+      .shell {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <div class="glass">
+      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <div>
+          <div class="title">Cat vs Dog Classifier</div>
+          <p class="subtitle mb-0">
+            Upload any pet photo and your trained CNN will guess if it is a cat or a dog in real time.
+          </p>
+        </div>
+        <span class="tag-pill">
+          <span style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></span>
+          TensorFlow • Flask
+        </span>
+      </div>
+
+      <form method="post" enctype="multipart/form-data">
+        <label for="file-input" class="upload-zone">
+          <div class="upload-icon-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
+                 viewBox="0 0 24 24" fill="none" stroke="#e5e7eb" stroke-width="1.7"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 15a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V9a4 4 0 0 0-4-4h-1.5"/>
+              <path d="m9 15 3-3 3-3"/>
+              <path d="M12 12V3"/>
+            </svg>
+          </div>
+
+          <div class="upload-title">Click to choose an image</div>
+          <div class="upload-hint">JPG or PNG • up to 10 MB</div>
+
+          <input
+            id="file-input"
+            type="file"
+            name="file"
+            accept="image/*"
+            class="d-none"
+            required
+            onchange="showFileName(this)"
+          />
+          <div id="file-name" class="file-name"></div>
+        </label>
+
+        <button type="submit" class="btn-gradient">
+          Predict
+        </button>
+      </form>
+
+      {% if prediction %}
+        <div class="row mt-3 g-3 align-items-start">
+          <div class="col-md-5">
+            <div class="result-card">
+              <div class="result-label">Model prediction</div>
+              <div class="result-value">{{ prediction }}</div>
+            </div>
+          </div>
+          <div class="col-md-7">
+            <div class="preview-wrapper">
+              <img
+                src="{{ url_for('static', filename='upload.jpg') }}"
+                alt="Uploaded image"
+                class="preview-img"
+              />
+              <div class="preview-caption">Uploaded image</div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <script>
+    function showFileName(input) {
+      const el = document.getElementById("file-name");
+      if (input.files && input.files[0]) {
+        el.textContent = input.files[0].name;
+      } else {
+        el.textContent = "";
+      }
+    }
+
+    document.querySelector(".upload-zone").addEventListener("click", () => {
+      document.getElementById("file-input").click();
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
